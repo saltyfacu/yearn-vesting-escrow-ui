@@ -9,6 +9,11 @@
       :href="'https://etherscan.io/address/' + escrow_address + '#code'",
       target="_blank"
     ) 📃Contract
+  div Escrow contract ABI:&nbsp;
+    a(
+      href="VestingEscrowSimple.json",
+      target="_blank"
+    ) 📄ABI
   div.spacer
   div <strong>Cliff {{ cliff_time }} </strong>
   div Start time: {{ start_time | fromUnix }}
