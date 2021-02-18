@@ -48,6 +48,8 @@
       span - UI:
       | 
       a(href="https://twitter.com/fameal", target="_blank") fameal
+  div.red(v-if="error")
+    span {{ error }}
 div(v-else)
   div.notFound
     p You are not on the list
@@ -126,12 +128,13 @@ export default {
     on_claim() {
       this.error = null;
 
-      if (this.is_cliff_over) {
+      if (!this.is_cliff_over) {
         this.error = ERROR_CLIFF_NOT_OVER;
         return;
       }
 
       this.drizzleInstance.contracts["Escrow"].methods["claim"].cacheSend(
+        this.activeAccount,
         ethers.utils.parseUnits(this.amount.toString(), this.vault_decimals).toString(),
         {
           from: this.activeAccount,
@@ -141,7 +144,7 @@ export default {
     on_claim_all() {
       this.error = null;
 
-      if (this.is_cliff_over) {
+      if (!this.is_cliff_over) {
         this.error = ERROR_CLIFF_NOT_OVER;
         return;
       }
