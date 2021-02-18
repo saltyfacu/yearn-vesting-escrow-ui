@@ -26,7 +26,7 @@
   div <strong>Your address: {{ activeAccount }} </strong>
   div Remaining Locked {{ remaining_locked | fromWei }} YFI
   div Claimed: {{ total_claimed | fromWei }} YFI
-  div Uncaimed: {{ unclaimed | fromWei }} YFI
+  div Unclaimed: {{ unclaimed | fromWei }} YFI
   div.spacer
   div(v-if="is_cliff_over",)
     b-field(label="Amount", custom-class="is-small")
