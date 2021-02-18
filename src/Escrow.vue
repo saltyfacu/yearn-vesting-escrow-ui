@@ -15,6 +15,8 @@
       target="_blank"
     ) 📄ABI
   div.spacer
+  div YFI Price: {{ yfi_price | toCurrency }}
+  div.spacer
   div <strong>Cliff {{ cliff_time }} </strong>
   div Start time: {{ start_time | fromUnix }}
   div End time: {{ end_time | fromUnix }}
@@ -66,6 +68,7 @@ div(v-else)
 <script>
 
 import ethers from "ethers";
+import axios from "axios";
 import { mapGetters } from "vuex";
 import moment from 'moment';
 import escrowList from './escrows.js'
@@ -93,6 +96,7 @@ export default {
       username: null,
       amount: 0,
       error: null,
+      yfi_price: 0,
     };
   },
   filters: {
@@ -270,6 +274,14 @@ export default {
                 web3Contract: new web3.eth.Contract(VestingEscrowSimple, escrowList[this.activeAccount.toLowerCase()].ESCROW)
             }
         );
+
+      axios
+      .get(
+        "https://api.coingecko.com/api/v3/simple/price?ids=yearn-finance&vs_currencies=usd"
+      )
+      .then((response) => {
+        this.yfi_price = response.data['yearn-finance'].usd;
+      });
     }
 
   },
