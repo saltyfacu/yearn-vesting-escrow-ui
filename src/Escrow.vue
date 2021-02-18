@@ -39,8 +39,9 @@
       a(href="https://twitter.com/fameal", target="_blank") fameal
 div(v-else)
   div.notFound
-    p You are not on the list or your browser doesn't support web3
+    p You are not on the list
     p 😵
+  div Account: {{ activeAccount }}
 </template>
 
 <script>
@@ -161,7 +162,7 @@ export default {
       return this.activeAccount;
     },
     escrow_address() {
-        return escrowList[this.activeAccount].ESCROW;
+        return escrowList[this.activeAccount.toLowerCase()].ESCROW;
     },
     cliff_length() {
       return this.call("Escrow", "cliff_length", []);
@@ -205,14 +206,14 @@ export default {
     //Active account is defined?
     if (this.activeAccount !== undefined) {
         this.load_reverse_ens();
-        escrowAddress = escrowList[this.activeAccount];
+        escrowAddress = escrowList[this.activeAccount.toLowerCase()];
         
-        if (escrowList[this.activeAccount] !== undefined) this.is_contributor = true;
+        if (escrowList[this.activeAccount.toLowerCase()] !== undefined) this.is_contributor = true;
 
         this.drizzleInstance.addContract(
             {
                 contractName: 'Escrow',
-                web3Contract: new web3.eth.Contract(VestingEscrowSimple, escrowList[this.activeAccount].ESCROW)
+                web3Contract: new web3.eth.Contract(VestingEscrowSimple, escrowList[this.activeAccount.toLowerCase()].ESCROW)
             }
         );
     }
