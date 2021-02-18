@@ -36,7 +36,8 @@
         @click.prevent="on_claim_all"
       ) 💰 Claim All
   div(v-else)
-    div Cliff is not over yet. Come back later 📅
+    div Cliff is not over yet. Come back later 🤑
+  div.spacer
   div.spacer
     .muted
       span Made with 💙
@@ -74,7 +75,8 @@ const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString();
 const BN_ZERO = new ethers.BigNumber.from(0);
 const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
-const ERROR_CLIFF_NOT_OVER = "Cliff is not over. You have to wait.";
+const ERROR_CLIFF_NOT_OVER = "Cliff is not over. You have to wait 😓";
+const ERROR_NEGATIVE_ALL = "You have to claim more than 0 🤓";
 
 export default {
   name: "Escrow",
@@ -143,7 +145,12 @@ export default {
     },
     on_claim_all() {
       this.error = null;
-
+      
+      if (this.amount <= 0) {
+        this.error = ERROR_NEGATIVE_ALL;
+        this.amount = 0;
+        return;
+      }
       if (!this.is_cliff_over) {
         this.error = ERROR_CLIFF_NOT_OVER;
         return;
