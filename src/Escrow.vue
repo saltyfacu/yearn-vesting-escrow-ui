@@ -60,9 +60,12 @@
     span {{ error }}
 div(v-else)
   div.notFound
-    p You are not on the list
-    p 😵
-  div Account: {{ activeAccount }}
+    p You are not part of the Citadel, yet
+    p But you can be! Check out the 
+    | 
+    a.blue(href="https://docs.yearn.finance/contributors/contributors") Contributors Guide
+    p 🚀
+  div.muted Active Account: {{ activeAccount }}
 </template>
 
 <script>
@@ -317,7 +320,7 @@ a:hover {
   color: gray;
 }
 div.notFound {
-	width: 800px;
+	width: 900px;
 	height: 200px;
 	margin: auto;
   text-align: center;
