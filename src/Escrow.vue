@@ -10,7 +10,7 @@
       target="_blank"
     ) 📃Contract
   div.spacer
-  div <strong>Cliff ends {{ cliff_time }} </strong>
+  div <strong>Cliff {{ cliff_time }} </strong>
   div Start time: {{ start_time | fromUnix }}
   div End time: {{ end_time | fromUnix }}
   div.spacer
@@ -171,7 +171,17 @@ export default {
       return this.call("Escrow", "start_time", []);
     },
     cliff_time() {
-        return moment.unix(this.start_time).add(this.cliff_length, 'seconds').fromNow();
+        let now = moment(new Date());
+        let cliff_end = moment.unix(this.start_time).add(this.cliff_length, 'seconds');
+        let prefix;
+
+        if (cliff_end.diff(now) < 0) {
+          prefix = "ended ";
+        } else {
+          prefix = "ends "
+        }
+
+        return prefix + moment.unix(this.start_time).add(this.cliff_length, 'seconds').fromNow();
     },
     unlock_progress() {
         let now = moment(new Date());
@@ -197,7 +207,7 @@ export default {
     },
     is_cliff_over() {
         let now = moment(new Date());
-        return  moment.unix(this.start_date).add(this.cliff_length, 'seconds').diff(now) >= 0;
+        return  moment.unix(this.start_time).add(this.cliff_length, 'seconds').diff(now) <= 0;
     },
   },
   async created() {
