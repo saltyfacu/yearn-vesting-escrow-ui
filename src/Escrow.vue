@@ -13,19 +13,30 @@
   div <strong>Cliff {{ cliff_time }} </strong>
   div Start time: {{ start_time | fromUnix }}
   div End time: {{ end_time | fromUnix }}
+  div Total locked: {{ total_locked | fromWei }} YFI
   div.spacer
   div Vesting Progress:
   progress-bar(:progress="unlock_progress" :width="50")
   div.spacer
   div <strong>Your address: {{ activeAccount }} </strong>
-  div Total locked: {{ total_locked | fromWei }} YFI
+  div Remaining Locked {{ remaining_locked | fromWei }} YFI
   div Claimed: {{ total_claimed | fromWei }} YFI
   div Uncaimed: {{ unclaimed | fromWei }} YFI
   div.spacer
-  button.unstyled(
-        v-if="is_cliff_over",
-        @click.prevent="on_claim"
-        ) 💰 Claim
+  div(v-if="is_cliff_over",)
+    b-field(label="Amount", custom-class="is-small")
+        b-input(v-model.number="amount", size="is-small", type="number",min=0, step=0.01)
+        p.control
+          b-button.is-static(size="is-small") YFI
+    div.spacer
+    button.unstyled(
+          @click.prevent="on_claim"
+          ) 💰 Claim
+    button.unstyled(
+        @click.prevent="on_claim_all"
+      ) 💰 Claim All
+  div(v-else)
+    div Cliff is not over yet. Come back later 📅
   div.spacer
     .muted
       span Made with 💙
@@ -121,6 +132,21 @@ export default {
       }
 
       this.drizzleInstance.contracts["Escrow"].methods["claim"].cacheSend(
+        ethers.utils.parseUnits(this.amount.toString(), this.vault_decimals).toString(),
+        {
+          from: this.activeAccount,
+        }
+      );
+    },
+    on_claim_all() {
+      this.error = null;
+
+      if (this.is_cliff_over) {
+        this.error = ERROR_CLIFF_NOT_OVER;
+        return;
+      }
+
+      this.drizzleInstance.contracts["Escrow"].methods["claim"].cacheSend(
         {
           from: this.activeAccount,
         }
@@ -204,6 +230,9 @@ export default {
     },
     unclaimed() {
       return this.call("Escrow", "unclaimed", []);
+    },
+    remaining_locked() {
+      return this.total_locked.sub(this.total_claimed).sub(this.unclaimed);
     },
     is_cliff_over() {
         let now = moment(new Date());
