@@ -158,11 +158,11 @@ export default {
     on_claim_all() {
       this.error = null;
       
-      if (this.amount <= 0) {
+      if (this.unclaimed <= 0) {
         this.error = ERROR_NEGATIVE_ALL;
-        this.amount = 0;
         return;
       }
+
       if (!this.is_cliff_over) {
         this.error = ERROR_CLIFF_NOT_OVER;
         return;
