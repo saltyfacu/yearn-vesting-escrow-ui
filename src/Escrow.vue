@@ -210,7 +210,7 @@ export default {
       return this.activeAccount;
     },
     escrow_address() {
-        return escrowList[this.activeAccount.toLowerCase()].ESCROW;
+        return escrowList[this.activeAccount];
     },
     cliff_length() {
       return this.call("Escrow", "cliff_length", []);
@@ -267,14 +267,14 @@ export default {
     //Active account is defined?
     if (this.activeAccount !== undefined) {
         this.load_reverse_ens();
-        escrowAddress = escrowList[this.activeAccount.toLowerCase()];
+        escrowAddress = escrowList[this.activeAccount];
         
-        if (escrowList[this.activeAccount.toLowerCase()] !== undefined) this.is_contributor = true;
+        if (escrowList[this.activeAccount] !== undefined) this.is_contributor = true;
 
         this.drizzleInstance.addContract(
             {
                 contractName: 'Escrow',
-                web3Contract: new web3.eth.Contract(VestingEscrowSimple, escrowList[this.activeAccount.toLowerCase()].ESCROW)
+                web3Contract: new web3.eth.Contract(VestingEscrowSimple, escrowList[this.activeAccount].ESCROW)
             }
         );
 
