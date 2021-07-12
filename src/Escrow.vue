@@ -210,7 +210,7 @@ export default {
       return web3.utils.toChecksumAddress(this.activeAccount);
     },
     escrow_address() {
-        return escrowList[this.user];
+        return escrowList[this.user].ESCROW;
     },
     cliff_length() {
       return this.call("Escrow", "cliff_length", []);
