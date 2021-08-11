@@ -90,4 +90,13 @@ export default Object.freeze({
   "0x25F8787A42b06Ce8CFCA2dF4a169a220147b5eFc": {
     ESCROW: "0x8651678562811fd1fCDA3315DCBF24AbFc70A0b4",
   },
+  "0xb512bfb6343b09c94ab48627caebf63009d7cfd2": {
+    ESCROW: "0xe0a5a6bd150eb8813f40c83511a9f7110c86f588",
+  },
+  "0x02c1dea7485423c9c9eb8c730c2aac56cff74adf": {
+    ESCROW: "0xaa18a25d7c169f27346b335495f1be6a13056674",
+  },
+  "0x1e808dce271ee5096614f3d34068f912c6459e7f": {
+    ESCROW: "0x9beff9095d9de093dba704f0eb78fbf0fe53a29a",
+  }
 });
