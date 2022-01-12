@@ -70,22 +70,15 @@ div(v-else)
 
 <script>
 
-import ethers from "ethers";
+import {ethers} from "ethers";
 import axios from "axios";
 import { mapGetters } from "vuex";
 import moment from 'moment';
 import escrowList from './escrows.js'
 import VestingEscrowSimple from './abi/VestingEscrowSimple.json';
 import ProgressBar from './components/ProgressBar';
-
 import Web3 from "web3";
-
-let web3 = new Web3(Web3.givenProvider);
-
-const max_uint = new ethers.BigNumber.from(2).pow(256).sub(1).toString();
-const BN_ZERO = new ethers.BigNumber.from(0);
-const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
-
+const web3 = new Web3(Web3.givenProvider);
 const ERROR_CLIFF_NOT_OVER = "Cliff is not over. You have to wait 😓";
 const ERROR_NEGATIVE_ALL = "You have to claim more than 0 🤓";
 
@@ -96,6 +89,8 @@ export default {
   },
   data() {
     return {
+      is_contributor: false,
+      chainTime: 0,
       username: null,
       amount: 0,
       error: null,
@@ -141,19 +136,20 @@ export default {
   methods: {
     on_claim() {
       this.error = null;
-
       if (!this.is_cliff_over) {
         this.error = ERROR_CLIFF_NOT_OVER;
         return;
       }
 
-      this.drizzleInstance.contracts["Escrow"].methods["claim"].cacheSend(
+      const escrowDrizzle = this.drizzleInstance.contracts["Escrow"];
+      const provider = new ethers.providers.Web3Provider(escrowDrizzle.currentProvider);
+    	const	signer = provider.getSigner();
+      const escrow = new ethers.Contract(escrowDrizzle.address, ['function claim(address, uint256)'], signer);
+      escrow.claim(
         this.activeAccount,
-        ethers.utils.parseUnits(this.amount.toString(), this.vault_decimals).toString(),
-        {
-          from: this.activeAccount,
-        }
-      );
+        ethers.utils.parseUnits(this.amount.toString(), this.vault_decimals),
+        {type: 2}
+      ).catch(e => this.error = (e.message || 'error'));
     },
     on_claim_all() {
       this.error = null;
@@ -162,17 +158,16 @@ export default {
         this.error = ERROR_NEGATIVE_ALL;
         return;
       }
-
       if (!this.is_cliff_over) {
         this.error = ERROR_CLIFF_NOT_OVER;
         return;
       }
 
-      this.drizzleInstance.contracts["Escrow"].methods["claim"].cacheSend(
-        {
-          from: this.activeAccount,
-        }
-      );
+      const escrowDrizzle = this.drizzleInstance.contracts["Escrow"];
+      const provider = new ethers.providers.Web3Provider(escrowDrizzle.currentProvider);
+    	const	signer = provider.getSigner();
+      const escrow = new ethers.Contract(escrowDrizzle.address, ['function claim()'], signer);
+      escrow.claim({type: 2}).catch(e => this.error = (e.message || 'error'));
     },
     async load_reverse_ens() {
       let lookup = this.activeAccount.toLowerCase().substr(2) + ".addr.reverse";
@@ -193,7 +188,7 @@ export default {
       switch (out) {
         case "number":
           if (value === null) value = 0;
-          return new ethers.BigNumber.from(value);
+          return ethers.BigNumber.from(value);
         case "address":
           return value;
         default:
@@ -219,27 +214,26 @@ export default {
       return this.call("Escrow", "start_time", []);
     },
     cliff_time() {
-        let now = moment(new Date());
-        let cliff_end = moment.unix(this.start_time).add(this.cliff_length, 'seconds');
-        let prefix;
+      if (!this.start_time.isZero()) {
+        const now = moment.unix(this.chainTime);
+        const cliff_end = moment.unix(this.start_time).add(this.cliff_length, 'seconds');
+        let   prefix = "ends ";
 
         if (cliff_end.diff(now) < 0) {
           prefix = "ended ";
-        } else {
-          prefix = "ends "
         }
-
-        return prefix + moment.unix(this.start_time).add(this.cliff_length, 'seconds').fromNow();
+        return prefix + moment.unix(this.start_time).add(this.cliff_length, 'seconds').from(now);
+      };
+      return ('');
     },
     unlock_progress() {
-        let now = moment(new Date());
-        let start = moment.unix(this.start_time);
-        let end = moment.unix(this.end_time);
-        
-        let total_duration = end.diff(start);
-        let duration = now.diff(start);
+        const now = moment.unix(this.chainTime);
+        const start = moment.unix(this.start_time);
+        const end = moment.unix(this.end_time);
+        const total_duration = end.diff(start);
+        const duration = now.diff(start);
 
-        return (this.end_time == 0 || this.start_time == 0)?0:duration/total_duration;
+        return (this.end_time == 0 || this.start_time == 0) ? 0 : duration / total_duration;
     },
     end_time() {
       return this.call("Escrow", "end_time", []);
@@ -257,24 +251,25 @@ export default {
       return this.total_locked.sub(this.total_claimed).sub(this.unclaimed);
     },
     is_cliff_over() {
-        let now = moment(new Date());
-        return  moment.unix(this.start_time).add(this.cliff_length, 'seconds').diff(now) <= 0;
+        const now = moment.unix(this.chainTime);
+        return moment.unix(this.start_time).add(this.cliff_length, 'seconds').diff(now) <= 0;
     },
   },
   async created() {
-    let escrowAddress;
-    
     //Active account is defined?
     if (this.activeAccount !== undefined) {
+    const {timestamp} = await web3.eth.getBlock()
+    this.chainTime = timestamp;
+
         this.load_reverse_ens();
-        escrowAddress = escrowList[this.user];
+        const escrowAddress = escrowList[this.user];
         
-        if (escrowList[this.user] !== undefined) this.is_contributor = true;
+        if (escrowAddress !== undefined) this.is_contributor = true;
 
         this.drizzleInstance.addContract(
             {
                 contractName: 'Escrow',
-                web3Contract: new web3.eth.Contract(VestingEscrowSimple, escrowList[this.user].ESCROW)
+                web3Contract: new web3.eth.Contract(VestingEscrowSimple, escrowAddress.ESCROW)
             }
         );
 

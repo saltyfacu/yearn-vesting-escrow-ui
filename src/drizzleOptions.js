@@ -1,9 +1,8 @@
 import ERC20 from './abi/ERC20.json'
-import VestingEscrowSimple from './abi/VestingEscrowSimple.json'
 
 import Web3 from 'web3'
-let web3 = new Web3(Web3.givenProvider);
 
+let web3 = new Web3(Web3.givenProvider);
 const options = {
   web3: {
     block: false,
