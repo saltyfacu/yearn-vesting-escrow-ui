@@ -7,10 +7,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import Web3 from 'web3'
 import Escrow from './Escrow'
-//import NotFound from './NotFound'
 import { mapGetters } from 'vuex'
 
 export default {

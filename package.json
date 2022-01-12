@@ -10,25 +10,23 @@
   "dependencies": {
     "@drizzle/store": "^1.5.3",
     "@drizzle/vue-plugin": "^0.1.3",
-    "axios": "^0.21.1",
-    "buefy": "^0.9.4",
-    "core-js": "^3.6.5",
-    "ethers": "^5.0.19",
-    "moment-timezone": "^0.5.33",
-    "pug": "^3.0.0",
+    "axios": "^0.24.0",
+    "buefy": "^0.9.14",
+    "core-js": "^3.20.2",
+    "ethers": "^5.5.3",
+    "moment-timezone": "^0.5.34",
+    "pug": "^3.0.2",
     "pug-plain-loader": "^1.1.0",
-    "vue": "^2.6.11",
+    "vue": "^2.6.14",
     "vue-moment": "^4.1.0",
     "vuex": "^3.6.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
+    "@vue/cli-service": "~4.5.15",
     "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
-    "vue-template-compiler": "^2.6.11"
+    "eslint": "^8.6.0",
+    "eslint-plugin-vue": "^8.2.0",
+    "vue-template-compiler": "^2.6.14"
   },
   "eslintConfig": {
     "root": true,
